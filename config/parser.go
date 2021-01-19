@@ -14,7 +14,7 @@ type route struct {
 
 type defaultResponse struct {
 	Body       string `yaml:"body"`
-	StatusCode string `yaml:"status_code"`
+	StatusCode int    `yaml:"status_code"`
 }
 
 type backend struct {
@@ -30,16 +30,16 @@ type spec struct {
 
 var ReadFile = ioutil.ReadFile
 
-func ParseRoutes(file string) ([]Route, error) {
+func ParseRoutes(file string) ([]Route, []byte, int, error) {
 	y, err := ReadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("error reading file: %w", err)
+		return nil, nil, 0, fmt.Errorf("error reading file: %w", err)
 	}
 
 	var s spec
 	err = yaml.Unmarshal(y, &s)
 	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling yaml: %w", err)
+		return nil, nil, 0, fmt.Errorf("error unmarshaling yaml: %w", err)
 	}
 
 	backends := make(map[string][]string, len(s.Backends))
@@ -51,7 +51,7 @@ func ParseRoutes(file string) ([]Route, error) {
 	for _, r := range s.Routes {
 		ml, ok := backends[r.Backend]
 		if !ok {
-			return nil, fmt.Errorf("backend not defined: %s", r.Backend)
+			return nil, nil, 0, fmt.Errorf("backend not defined: %s", r.Backend)
 		}
 
 		route := Route{
@@ -61,5 +61,5 @@ func ParseRoutes(file string) ([]Route, error) {
 		routes = append(routes, route)
 	}
 
-	return routes, nil
+	return routes, []byte(s.DefaultResponse.Body), s.DefaultResponse.StatusCode, nil
 }

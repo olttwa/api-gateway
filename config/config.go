@@ -6,8 +6,10 @@ import (
 )
 
 type config struct {
-	port   int
-	routes []Route
+	port       string
+	routes     []Route
+	body       []byte
+	statusCode int
 }
 
 type Route struct {
@@ -17,7 +19,7 @@ type Route struct {
 
 var cfg config
 
-func Port() int {
+func Port() string {
 	return cfg.port
 }
 
@@ -25,19 +27,29 @@ func Routes() []Route {
 	return cfg.routes
 }
 
+func DefaultResponseBody() []byte {
+	return cfg.body
+}
+
+func DefaultResponseStatusCode() int {
+	return cfg.statusCode
+}
+
 func Load() {
 	cfgFile := flag.String("config", "config.yml", "config filename")
-	port := flag.Int("port", 8080, "port for receiving traffic")
+	port := flag.String("port", "8080", "port for receiving traffic")
 
 	flag.Parse()
 
-	routes, err := ParseRoutes(*cfgFile)
+	routes, body, code, err := ParseRoutes(*cfgFile)
 	if err != nil {
 		log.Fatalf("config loading failed: %s", err)
 	}
 
 	cfg = config{
-		port:   *port,
-		routes: routes,
+		port:       *port,
+		routes:     routes,
+		body:       body,
+		statusCode: code,
 	}
 }

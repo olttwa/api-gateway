@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/docker/docker/api/types"
@@ -14,7 +15,7 @@ type docker struct {
 }
 
 type Client interface {
-	ListContainers(ctx context.Context, labels []string) ([]types.Container, error)
+	ListContainers(ctx context.Context, labels []string) ([]Container, error)
 }
 
 func Initialize() Client {
@@ -25,14 +26,26 @@ func Initialize() Client {
 	return docker{cli}
 }
 
-func (d docker) ListContainers(ctx context.Context, labels []string) ([]types.Container, error) {
+func (d docker) ListContainers(ctx context.Context, labels []string) ([]Container, error) {
 	filters := filters.NewArgs()
 	for _, l := range labels {
 		filters.Add("label", l)
 	}
+
 	containers, err := d.c.ContainerList(ctx, types.ContainerListOptions{Filters: filters})
 	if err != nil {
 		return nil, err
 	}
-	return containers, nil
+
+	c := make([]Container, 0, len(containers))
+	for _, container := range containers {
+		for _, p := range container.Ports {
+			c = append(c, Container{
+				IP:   p.IP,
+				Port: fmt.Sprintf("%d", p.PublicPort),
+			})
+		}
+
+	}
+	return c, nil
 }
