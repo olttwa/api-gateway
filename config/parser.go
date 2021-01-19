@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
-	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -50,15 +49,9 @@ func ParseRoutes(file string) ([]Route, error) {
 
 	routes := make([]Route, 0, len(s.Routes))
 	for _, r := range s.Routes {
-		labels, ok := backends[r.Backend]
+		ml, ok := backends[r.Backend]
 		if !ok {
 			return nil, fmt.Errorf("backend not defined: %s", r.Backend)
-		}
-
-		ml := make(map[string]string, len(labels))
-		for _, l := range labels {
-			split := strings.Split(l, "=")
-			ml[split[0]] = split[1]
 		}
 
 		route := Route{

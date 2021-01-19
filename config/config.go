@@ -12,7 +12,7 @@ type config struct {
 
 type Route struct {
 	PathPrefix  string
-	MatchLabels map[string]string
+	MatchLabels []string
 }
 
 var cfg config
@@ -33,7 +33,7 @@ func Load() {
 
 	routes, err := ParseRoutes(*cfgFile)
 	if err != nil {
-		log.Fatalf("Config loading failed: %s", err.Error())
+		log.Fatalf("config loading failed: %s", err)
 	}
 
 	cfg = config{
