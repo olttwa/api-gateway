@@ -8,9 +8,13 @@ A configurable HTTP API Gateway for applications running on Docker containers.
 - Graceful Shutdown
 - Traffic stats
 
+### Rationale behind decisions
+
+- Golang because of docker SDK, stats middleware, reverseproxy utility,
+
 ### Assumptions
 
-- External libraries have been used to reduce dev efforts.
+- A backend container is chosen during intialization, not during runtime.
 
 ### Development
 

@@ -3,8 +3,6 @@ package router
 import (
 	"context"
 	"log"
-	"net/http/httputil"
-	"net/url"
 	"rgate/config"
 	"rgate/docker"
 	"rgate/handler"
@@ -23,12 +21,8 @@ func New(d docker.Client) *mux.Router {
 			log.Fatalf("error listing containers: %s", err)
 		}
 
-		url := url.URL{
-			Scheme: "http",
-			Host:   c[0].IP + ":" + c[0].Port,
-		}
-		rp := httputil.NewSingleHostReverseProxy(&url)
-		r.PathPrefix(route.PathPrefix).Handler(rp)
+		h := handler.Backend(c)
+		r.PathPrefix(route.PathPrefix).Handler(h)
 	}
 	return r
 }
