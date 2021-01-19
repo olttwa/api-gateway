@@ -8,17 +8,31 @@ import (
 	"rgate/utils"
 )
 
+type backend struct {
+	containers []docker.Container
+}
+
+func (b backend) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	rp := b.reverseProxy()
+	rp.ServeHTTP(w, r)
+}
+
 func Backend(c []docker.Container) http.Handler {
-	host := randomBackend(c)
+	return backend{c}
+}
+
+func (b backend) reverseProxy() http.Handler {
 	url := url.URL{
 		Scheme: "http",
-		Host:   host,
+		Host:   b.host(),
 	}
 	rp := httputil.NewSingleHostReverseProxy(&url)
+	rp.ErrorHandler = ErrorHandler
 	return rp
 }
 
-func randomBackend(c []docker.Container) string {
+func (b backend) host() string {
+	c := b.containers
 	if len(c) == 0 {
 		return ""
 	}

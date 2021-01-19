@@ -14,7 +14,8 @@ A configurable HTTP API Gateway for applications running on Docker containers.
 
 ### Assumptions
 
-- A backend container is chosen during intialization, not during runtime.
+- For multiple backends, any container is randomly chosen at runtime, not during initialization
+- No health-check is performed when choosing a backend
 
 ### Development
 
