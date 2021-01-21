@@ -1,28 +1,29 @@
 package router
 
 import (
-	"context"
-	"log"
 	"rgate/config"
 	"rgate/docker"
 	"rgate/handler"
+	"rgate/middleware"
 
 	"github.com/gorilla/mux"
 )
 
 func New(d docker.Client) *mux.Router {
-	ctx := context.Background()
 	r := mux.NewRouter()
-	r.NotFoundHandler = handler.NotFound()
 
 	for _, route := range config.Routes() {
-		c, err := d.ListContainers(ctx, route.MatchLabels)
-		if err != nil {
-			log.Fatalf("error listing containers: %s", err)
-		}
-
-		h := handler.Backend(c)
+		h := handler.Backend(d, route.MatchLabels)
 		r.PathPrefix(route.PathPrefix).Handler(h)
 	}
+
+	stats := middleware.StatsMw()
+	r.Use(stats.Middleware)
+	r.Handle("/stats", handler.StatsHandler(stats))
+
+	// Refrain from using Mux Router's NotFoundHandler for default
+	// responses because stats middleware doesn't intercept them.
+	r.PathPrefix("").Handler(handler.Default())
+
 	return r
 }

@@ -23,7 +23,7 @@ func Serve(r *mux.Router) {
 
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		log.Println("starting gateway")
+		log.Println("http: Starting server")
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
@@ -42,13 +42,13 @@ func Serve(r *mux.Router) {
 	defer cancel()
 	// Doesn't block if no connections, but will otherwise wait
 	// until the timeout deadline.
+	log.Println("http: Closing server")
 	err := srv.Shutdown(ctx)
 	if err != nil {
-		log.Printf("error shutting down gateway: %s", err)
+		log.Printf("error: Shutting down server: %s", err)
 	}
 	// Optionally, you could run srv.Shutdown in a goroutine and block on
 	// <-ctx.Done() if your application should wait for other services
 	// to finalize based on context cancellation.
-	log.Println("shutting down gateway")
 	os.Exit(0)
 }

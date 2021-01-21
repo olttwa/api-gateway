@@ -11,11 +11,13 @@ A configurable HTTP API Gateway for applications running on Docker containers.
 ### Rationale behind decisions
 
 - Golang because of docker SDK, stats middleware, reverseproxy utility,
+- encapsulation is performed at package level to avoid mutations
 
 ### Assumptions
 
 - For multiple backends, any container is randomly chosen at runtime, not during initialization
 - No health-check is performed when choosing a backend
+- HTTP Method isn't taken into consideration for routing
 
 ### Development
 
