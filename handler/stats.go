@@ -16,19 +16,19 @@ type Stats interface {
 }
 
 type stats struct {
-	s Stats
+	Stats
 }
 
 func (s stats) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	d := model.Stats{
 		Requests: model.Requests{
-			Success: s.s.Success(),
-			Error:   s.s.Errors(),
+			Success: s.Success(),
+			Error:   s.Errors(),
 		},
 		Latency: model.Latency{
-			Average: s.s.Mean(),
-			P95:     s.s.Percentile(95),
-			P99:     s.s.Percentile(99),
+			Average: s.Mean(),
+			P95:     s.Percentile(95),
+			P99:     s.Percentile(99),
 		},
 	}
 

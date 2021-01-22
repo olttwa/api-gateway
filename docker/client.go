@@ -4,29 +4,18 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"rgate/model"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 )
 
-type docker struct {
+type Docker struct {
 	c *client.Client
 }
 
-type Client interface {
-	ListContainers(ctx context.Context, labels []string) ([]Container, error)
-}
-
-func Initialize() Client {
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		log.Fatalf("error initializing docker client: %s", err)
-	}
-	return docker{cli}
-}
-
-func (d docker) ListContainers(ctx context.Context, labels []string) ([]Container, error) {
+func (d Docker) ListContainers(ctx context.Context, labels []string) ([]model.Container, error) {
 	filters := filters.NewArgs()
 	for _, l := range labels {
 		filters.Add("label", l)
@@ -37,10 +26,10 @@ func (d docker) ListContainers(ctx context.Context, labels []string) ([]Containe
 		return nil, err
 	}
 
-	c := make([]Container, 0, len(containers))
+	c := make([]model.Container, 0, len(containers))
 	for _, container := range containers {
 		for _, p := range container.Ports {
-			c = append(c, Container{
+			c = append(c, model.Container{
 				IP:   p.IP,
 				Port: fmt.Sprintf("%d", p.PublicPort),
 			})
@@ -48,4 +37,12 @@ func (d docker) ListContainers(ctx context.Context, labels []string) ([]Containe
 
 	}
 	return c, nil
+}
+
+func New() Docker {
+	c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		log.Fatalf("error initializing docker client: %s", err)
+	}
+	return Docker{c}
 }

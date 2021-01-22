@@ -1,4 +1,4 @@
-package docker
+package model
 
 type Container struct {
 	IP   string

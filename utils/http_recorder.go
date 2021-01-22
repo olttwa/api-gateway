@@ -7,7 +7,7 @@ type ResponseRecorder struct {
 	status int
 }
 
-// Overwrite WriteHeader method to capture status.
+// WriteHeader is overwritten to capture status.
 func (r *ResponseRecorder) WriteHeader(s int) {
 	r.ResponseWriter.WriteHeader(s)
 	r.status = s

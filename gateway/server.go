@@ -6,15 +6,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"rgate/config"
 	"time"
 
 	"github.com/gorilla/mux"
 )
 
-func Serve(r *mux.Router) {
+func Serve(port string, r *mux.Router) {
 	srv := &http.Server{
-		Addr:         "0.0.0.0:" + config.Port(),
+		Addr:         "0.0.0.0:" + port,
 		WriteTimeout: time.Second * 5,
 		ReadTimeout:  time.Second * 5,
 		IdleTimeout:  time.Second * 60,

@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"rgate/docker"
+	"rgate/model"
 	"rgate/utils"
 )
 
 type backend struct {
-	containers []docker.Container
+	containers []model.Container
 }
 
 func (b backend) host() string {
@@ -39,7 +39,11 @@ func (b backend) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rp.ServeHTTP(w, r)
 }
 
-func Backend(d docker.Client, ml []string) http.Handler {
+type Docker interface {
+	ListContainers(context.Context, []string) ([]model.Container, error)
+}
+
+func Backend(d Docker, ml []string) http.Handler {
 	ctx := context.Background()
 	c, err := d.ListContainers(ctx, ml)
 	if err != nil {

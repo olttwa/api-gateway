@@ -2,17 +2,13 @@ package main
 
 import (
 	"rgate/config"
-	"rgate/docker"
 	"rgate/gateway"
 	"rgate/router"
-	"rgate/utils"
 )
 
 func main() {
-	utils.SeedRandom()
-	config.Load()
-	d := docker.Initialize()
+	cfg := config.Load()
 
-	r := router.New(d)
-	gateway.Serve(r)
+	r := router.New(cfg)
+	gateway.Serve(cfg.Port(), r)
 }

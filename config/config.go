@@ -2,54 +2,63 @@ package config
 
 import (
 	"flag"
+	"io/ioutil"
 	"log"
+	"rgate/model"
+	"rgate/utils"
+
+	"gopkg.in/yaml.v2"
 )
 
-type config struct {
-	port       string
-	routes     []Route
-	body       []byte
-	statusCode int
+type Config struct {
+	port        string
+	defaultBody []byte
+	defaultCode int
+	routes      []model.Route
 }
 
-type Route struct {
-	PathPrefix  string
-	MatchLabels []string
+func (cfg *Config) parseRoutes(file string) {
+	y, err := ioutil.ReadFile(file)
+	if err != nil {
+		log.Fatalf("error reading file: %s", err)
+	}
+
+	var s model.Spec
+	err = yaml.Unmarshal(y, &s)
+	if err != nil {
+		log.Fatalf("error unmarshaling yaml: %s", err)
+	}
+
+	cfg.defaultBody = []byte(s.DefaultResponse.Body)
+	cfg.defaultCode = s.DefaultResponse.StatusCode
+	cfg.routes, err = utils.MatchRoutesToBackend(s)
+	if err != nil {
+		log.Fatalf("error matching routes to backends: %s", err)
+	}
 }
 
-var cfg config
-
-func Port() string {
+func (cfg *Config) Port() string {
 	return cfg.port
 }
 
-func Routes() []Route {
+func (cfg *Config) Routes() []model.Route {
 	return cfg.routes
 }
 
-func DefaultResponseBody() []byte {
-	return cfg.body
+func (cfg *Config) DefaultBody() []byte {
+	return cfg.defaultBody
 }
 
-func DefaultResponseStatusCode() int {
-	return cfg.statusCode
+func (cfg *Config) DefaultCode() int {
+	return cfg.defaultCode
 }
 
-func Load() {
+func Load() *Config {
 	cfgFile := flag.String("config", "config.yml", "config filename")
 	port := flag.String("port", "8080", "port for receiving traffic")
-
 	flag.Parse()
 
-	routes, body, code, err := ParseRoutes(*cfgFile)
-	if err != nil {
-		log.Fatalf("config loading failed: %s", err)
-	}
-
-	cfg = config{
-		port:       *port,
-		routes:     routes,
-		body:       body,
-		statusCode: code,
-	}
+	c := Config{port: *port}
+	c.parseRoutes(*cfgFile)
+	return &c
 }
