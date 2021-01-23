@@ -22,7 +22,7 @@ func TestBackendReverseProxy(t *testing.T) {
 	authHeader := "Bearer: 12345"
 	body := []byte("request body")
 
-	mockHandler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+	mockHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, method, r.Method)
 		assert.Equal(t, path, r.URL.Path)
 		assert.Equal(t, authHeader, r.Header.Get("Authorization"))

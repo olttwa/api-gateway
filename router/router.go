@@ -24,7 +24,7 @@ func New(cfg config) *mux.Router {
 		r.PathPrefix(route.PathPrefix).Handler(h)
 	}
 
-	stats := middleware.StatsMw()
+	stats := middleware.StatsMW()
 	r.Use(stats.Middleware)
 	r.Handle("/stats", handler.Stats(stats))
 

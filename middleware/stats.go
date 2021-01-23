@@ -17,7 +17,7 @@ const (
 )
 
 type Stats struct {
-	m             *sync.Mutex
+	sync.Mutex
 	success       int
 	errors        int
 	responseTimes []float64
@@ -59,8 +59,8 @@ func (s *Stats) Middleware(next http.Handler) http.Handler {
 		responseTime := time.Since(start)
 
 		// Handle race conditions.
-		s.m.Lock()
-		defer s.m.Unlock()
+		s.Lock()
+		defer s.Unlock()
 
 		if recorder.Status() > errorThreshold {
 			s.errors++
@@ -72,8 +72,6 @@ func (s *Stats) Middleware(next http.Handler) http.Handler {
 	})
 }
 
-func StatsMw() *Stats {
-	return &Stats{
-		m: &sync.Mutex{},
-	}
+func StatsMW() *Stats {
+	return &Stats{}
 }
