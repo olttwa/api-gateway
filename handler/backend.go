@@ -39,11 +39,11 @@ func (b backend) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rp.ServeHTTP(w, r)
 }
 
-type Docker interface {
+type docker interface {
 	ListContainers(context.Context, []string) ([]model.Container, error)
 }
 
-func Backend(d Docker, ml []string) http.Handler {
+func Backend(d docker, ml []string) http.Handler {
 	ctx := context.Background()
 	c, err := d.ListContainers(ctx, ml)
 	if err != nil {

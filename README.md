@@ -35,3 +35,8 @@ make run
 ```
 make test
 ```
+
+##### Linting
+```
+make lint
+```

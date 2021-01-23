@@ -8,27 +8,27 @@ import (
 	"rgate/utils"
 )
 
-type Stats interface {
+type stats interface {
 	Success() int
 	Errors() int
 	Mean() int
 	Percentile(float64) int
 }
 
-type stats struct {
-	Stats
+type statsHandler struct {
+	stats
 }
 
-func (s stats) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h statsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	d := model.Stats{
 		Requests: model.Requests{
-			Success: s.Success(),
-			Error:   s.Errors(),
+			Success: h.Success(),
+			Error:   h.Errors(),
 		},
 		Latency: model.Latency{
-			Average: s.Mean(),
-			P95:     s.Percentile(95),
-			P99:     s.Percentile(99),
+			Average: h.Mean(),
+			P95:     h.Percentile(95),
+			P99:     h.Percentile(99),
 		},
 	}
 
@@ -44,6 +44,6 @@ func (s stats) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func StatsHandler(s Stats) http.Handler {
-	return stats{s}
+func Stats(s stats) http.Handler {
+	return statsHandler{s}
 }

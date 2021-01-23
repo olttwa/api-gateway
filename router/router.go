@@ -9,13 +9,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Config interface {
+type config interface {
 	Routes() []model.Route
 	DefaultBody() []byte
 	DefaultCode() int
 }
 
-func New(cfg Config) *mux.Router {
+func New(cfg config) *mux.Router {
 	r := mux.NewRouter()
 
 	d := docker.New()
@@ -26,7 +26,7 @@ func New(cfg Config) *mux.Router {
 
 	stats := middleware.StatsMw()
 	r.Use(stats.Middleware)
-	r.Handle("/stats", handler.StatsHandler(stats))
+	r.Handle("/stats", handler.Stats(stats))
 
 	// Refrain from using Mux Router's NotFoundHandler for default
 	// responses because stats middleware doesn't intercept them.
