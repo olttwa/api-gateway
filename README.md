@@ -1,4 +1,4 @@
-# RGate
+## RGate
 
 A configurable HTTP API Gateway for applications running on Docker containers.
 
@@ -6,37 +6,46 @@ A configurable HTTP API Gateway for applications running on Docker containers.
 
 - Configurable routes and backends
 - Graceful Shutdown
-- Traffic stats
+- Accurate traffic stats
 
 ### Rationale behind decisions
 
-- Golang because of docker SDK, stats middleware, reverseproxy utility,
-- encapsulation is performed at package level to avoid mutations
+- Chose Golang as programming language because of:
+  - Docker SDK
+  - Simple routing and middleware usage
+  - Reverse Proxy Utility
+- Encapsulation is done at package level to avoid mutations
 
 ### Assumptions
 
-- For multiple backends, any container is randomly chosen at runtime, not during initialization
-- No health-check is performed when choosing a backend
+- For multiple backends, any container is randomly chosen at runtime (instead of load time)
 - HTTP Method isn't taken into consideration for routing
+- Mutex is used to avoid race conditions when measuring stats
+- HTTP Connections to backend aren't pooled/reused
+- No health-check is performed when choosing a backend
 
 ### Development
 
-##### Instalment
-```
+#### Instalment
+
+```bash
 make install
 ```
 
-##### Running
-```
-make run
+#### Running
+
+```bash
+rgate --port 8080 --config config.yml
 ```
 
-##### Unit Tests
-```
+#### Unit Tests
+
+```bash
 make test
 ```
 
-##### Linting
-```
+#### Linting
+
+```bash
 make lint
 ```

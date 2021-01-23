@@ -15,10 +15,6 @@ build:
 install:
 	go install ./cmd/rgate
 
-.PHONY: run
-run:
-	go run ./cmd/rgate
-
 .PHONY: test
 test:
-	go test ./cmd/rgate
+	go test -race -cover ./...
