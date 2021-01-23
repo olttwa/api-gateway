@@ -12,16 +12,16 @@ import (
 )
 
 type Docker struct {
-	c *client.Client
+	*client.Client
 }
 
-func (d Docker) ListContainers(ctx context.Context, labels []string) ([]model.Container, error) {
+func (d *Docker) ListContainers(ctx context.Context, labels []string) ([]model.Container, error) {
 	filters := filters.NewArgs()
 	for _, l := range labels {
 		filters.Add("label", l)
 	}
 
-	containers, err := d.c.ContainerList(ctx, types.ContainerListOptions{Filters: filters})
+	containers, err := d.ContainerList(ctx, types.ContainerListOptions{Filters: filters})
 	if err != nil {
 		return nil, err
 	}
@@ -39,10 +39,10 @@ func (d Docker) ListContainers(ctx context.Context, labels []string) ([]model.Co
 	return c, nil
 }
 
-func New() Docker {
+func New() *Docker {
 	c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatalf("error initializing docker client: %s", err)
 	}
-	return Docker{c}
+	return &Docker{c}
 }
