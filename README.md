@@ -1,6 +1,7 @@
 ## RGate
 
 A configurable HTTP API Gateway for applications running on Docker containers.
+Detailed architecture can be found in [api_gateway_docker.pdf](https://github.com/olttwa/api-gateway/blob/master/api_gateway_docker.pdf).
 
 ### Features
 
