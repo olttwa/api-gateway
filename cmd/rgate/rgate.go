@@ -10,5 +10,5 @@ func main() {
 	cfg := config.Load()
 
 	r := router.New(cfg)
-	gateway.Serve(cfg.Port(), r)
+	gateway.Serve(cfg, r)
 }

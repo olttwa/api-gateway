@@ -11,9 +11,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Serve(port string, r *mux.Router) {
+type config interface {
+	Port() string
+}
+
+func Serve(cfg config, r *mux.Router) {
 	srv := &http.Server{
-		Addr:         "0.0.0.0:" + port,
+		Addr:         "0.0.0.0:" + cfg.Port(),
 		WriteTimeout: time.Second * 5,
 		ReadTimeout:  time.Second * 5,
 		IdleTimeout:  time.Second * 60,
